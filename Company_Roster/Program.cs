@@ -1,73 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Company_Roster
 {
+    class Employee
+    {
+        public Employee(string name, double salary, string department)
+        {
+            this.Name = name;
+            this.Salary = salary;
+            this.Department = department;
+        }
+
+        public string Name { get; set; }
+
+        public double Salary { get; set; }
+
+        public string Department { get; set; }
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
-            int n = int.Parse(Console.ReadLine());
-            string input = string.Empty;
-            List<Employee> employees = new List<Employee>();
-            Dictionary<string, double> sortedDepartments = new Dictionary<string, double>();
-            double allSalary = 0.00;
-            double firstSalary = 0.00;
-            int counter = 1;
+            int numberOfEmpoyee = int.Parse(Console.ReadLine());
 
-            for (int i = 0; i < n; i++)
+            Dictionary<string, List<Employee>> listOfEmpoyee = new Dictionary<string, List<Employee>>();
+            for (int i = 0; i < numberOfEmpoyee; i++)
             {
-                input = Console.ReadLine();
-                string[] tokens = input.Split();
+                string[] info = Console.ReadLine().Split();
+                string name = info[0];
+                double salary = double.Parse(info[1]);
+                string department = info[2];
 
-                string name = tokens[0];
-                double salary = double.Parse(tokens[1]);
-                string department = tokens[2];
+                Employee newEmployee = new Employee(name, salary, department);
 
-                Employee employee = new Employee()
+                if (listOfEmpoyee.ContainsKey(department) == false)
                 {
-                    Name = name,
-                    Salary = salary,
-                    Department = department,
-                };
-                employees.Add(employee);
-
-                if (sortedDepartments.ContainsKey(department))
-                {
-                    sortedDepartments[department] += salary;
-
-
-                    counter++;
+                    listOfEmpoyee.Add(department, new List<Employee>());
                 }
-                else
+                listOfEmpoyee[department].Add(newEmployee);
+            }
+
+            double averangeSalaryMax = 0;
+            string bestDepartment = string.Empty;
+
+            foreach (var kvp in listOfEmpoyee)
+            {
+                string department = kvp.Key;
+                double salary = 0;
+                foreach (var employee in kvp.Value)
                 {
-                    sortedDepartments.Add(department, employee.Salary);
+                    salary += employee.Salary;
+                }
+
+                salary /= kvp.Value.Count;
+
+                if (averangeSalaryMax < salary)
+                {
+                    averangeSalaryMax = salary;
+                    bestDepartment = department;
                 }
             }
 
-        }
-        static Employee GetSalary(List<Employee> employees, string department, double salary)
-        {
-            Employee averageSalary = null;
+            Console.WriteLine($"Highest Average Salary: {bestDepartment}");
+            var result = listOfEmpoyee.Where(x => x.Key == bestDepartment);
 
-
-
-            foreach (Employee employee in employees)
+            foreach (var kvp in result)
             {
-                if (student.FirstName == firstName && student.LastName == lastName)
+                foreach (var employee in kvp.Value.OrderByDescending(x => x.Salary))
                 {
-                    averageSalary = employee;
+                    Console.WriteLine($"{employee.Name} {employee.Salary:f2}");
                 }
             }
-            return averageSalary;
-        }
-
-
-        class Employee
-        {
-            public string Name { get; set; }
-            public double Salary { get; set; }
-            public string Department { get; set; }
         }
     }
 }
